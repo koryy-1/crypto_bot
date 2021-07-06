@@ -1,0 +1,16 @@
+aiohttp==3.7.4.post0
+async-timeout==3.0.1
+attrs==21.2.0
+certifi==2021.5.30
+chardet==4.0.0
+discord.py==1.7.3
+idna==2.10
+multidict==5.1.0
+pypiwin32==223
+PyRect==0.1.4
+PyScreeze==0.1.27
+python-Levenshtein==0.12.2
+PyTweening==1.0.3
+pywin32==300
+requests==2.25.1
+typing-extensions==3.10.0.0
