@@ -1,1 +1,1 @@
-worker: python bot-over-ever.py
+worker: python crypto_bot.py
