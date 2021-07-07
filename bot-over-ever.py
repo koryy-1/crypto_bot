@@ -45,7 +45,7 @@ def get_depth(coin1='btc', coin2='usd', limit=150):
 	return f'Total bids: {total_bids_amount} $', ask, bid
 
 
-def get_trades(coin1='btc', coin2='usd', limit=150, idx=1):
+async def get_trades(coin1='btc', coin2='usd', limit=150, idx=1):
 	response = requests.get(url=f"https://yobit.net/api/3/trades/{coin1}_{coin2}?limit={limit}&ignore_invalid=1")
 
 	# date = datetime.datetime.today()
@@ -158,14 +158,16 @@ async def on_message(message):
 
 			# print(get_depth())
 
-			info, event, compare, ans1, ans2 = get_trades(idx=i)
-			print(event)
+			info, event, compare, ans1, ans2 = await get_trades(idx=i)
+			# print(event)
 			if (event != 'xyunya'):
 				await message.channel.send(info)
 				await message.channel.send(event)
 				await message.channel.send(compare)
 				await message.channel.send(ans1)
 				await message.channel.send(ans2)
+			else:
+				await message.channel.send(info)
 
 			time.sleep(900)
 		# print(f'balance_btc = {balance_btc} \nbalance_usd = {balance_usd}')
