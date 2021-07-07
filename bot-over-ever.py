@@ -92,14 +92,16 @@ async def get_trades(coin1='btc', coin2='usd', limit=150, idx=1):
 		# print(f'new price ask {round(new_price_ask, 2)} $\nlast price ask {round(last_price_ask, 2)}')
 		compare = f'new price ask {round(new_price_ask, 2)} $\nlast price ask {round(last_price_ask, 2)} $'
 		_, ask, _ = get_depth(coin1=coin1)
-		deposite = 0.1 * balance_usd
+		deposite = 0.1 * balance_usd # 5%
 		income  = deposite / ask
-		# print(f'balance_btc = {balance_btc + income}')
-		# print(f'balance_usd = {balance_usd - deposite}')
-		ans1 = f'balance_btc = {balance_btc + income}'
-		ans2 = f'balance_usd = {balance_usd - deposite}'
+		balance_btc = balance_btc + income
+		balance_usd = balance_usd - deposite
+		# print(f'balance_btc = {balance_btc}')
+		# print(f'balance_usd = {balance_usd}')
+		ans1 = f'balance_btc = {balance_btc}'
+		ans2 = f'balance_usd = {round(balance_usd, 2)} $'
 
-		return info, 'pump', compare, ans1, ans2 ###
+		return info, 'event: pump', compare, ans1, ans2 ###
 
 	# # dump
 	# if (new_price_bid / last_price_bid < 0.9):
@@ -108,12 +110,32 @@ async def get_trades(coin1='btc', coin2='usd', limit=150, idx=1):
 	# 	_, _, bid = get_depth(coin1=coin1)
 	# 	deposite = 0.1 * balance_btc
 	# 	income  = deposite * bid
-	# 	print('balance_btc =', balance_btc - deposite)
-	# 	print('balance_usd =', balance_usd + income)
+	# 	balance_btc = balance_btc - deposite
+	# 	balance_usd = balance_usd + income
+	# 	print('balance_btc =', balance_btc)
+	# 	print('balance_usd =', balance_usd)
 	
 
-	return info, 'xyunya', 'xyunya', 'xyunya', 'xyunya',
+	return info, 'xyunya', 'xyunya', 'xyunya', 'xyunya'
 
+
+# def main():
+# global balance_btc
+# global balance_usd
+
+balance_btc = 0
+
+balance_usd = 1
+
+# global last_price_ask
+# global new_price_ask
+# global last_price_bid
+# global new_price_bid
+
+last_price_ask = 0
+new_price_ask = 0
+last_price_bid = 0
+new_price_bid = 0
 
 
 client = discord.Client()
@@ -129,23 +151,7 @@ async def on_message(message):
 
 	if message.content.startswith('!start-tracking-prices'):
 		# await message.channel.send('')
-		# def main():
-		# global balance_btc
-		# global balance_usd
-
-		balance_btc = 0
-
-		balance_usd = 1
-
-		# global last_price_ask
-		# global new_price_ask
-		# global last_price_bid
-		# global new_price_bid
-
-		last_price_ask = 0
-		new_price_ask = 0
-		last_price_bid = 0
-		new_price_bid = 0
+		
 
 		for i in range(40):
 			date = datetime.datetime.today()
@@ -162,16 +168,21 @@ async def on_message(message):
 			# print(event)
 			if (event != 'xyunya'):
 				await message.channel.send(info)
+				time.sleep(0.5)
 				await message.channel.send(event)
+				time.sleep(0.5)
 				await message.channel.send(compare)
+				time.sleep(0.5)
 				await message.channel.send(ans1)
+				time.sleep(0.5)
 				await message.channel.send(ans2)
 			else:
 				await message.channel.send(info)
 
+			await message.channel.send('======================')
 			time.sleep(900)
 		# print(f'balance_btc = {balance_btc} \nbalance_usd = {balance_usd}')
-		balance = f'balance_btc = {balance_btc}\nbalance_usd = {balance_usd}\nцикл отработал'
+		balance = f'balance_btc = {balance_btc}\nbalance_usd = {round(balance_usd, 2)}\nцикл отработал'
 		await message.channel.send(balance)
 
 		# if __name__ == '__main__':
