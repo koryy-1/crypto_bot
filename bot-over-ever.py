@@ -103,17 +103,25 @@ async def get_trades(coin1='btc', coin2='usd', limit=150, idx=1):
 
 		return info, 'event: pump', compare, ans1, ans2 ###
 
-	# # dump
-	# if (new_price_bid / last_price_bid < 0.9):
-	# 	print('dump')
-	# 	print('new_price_bid:', round(new_price_bid, 2), 'last_price_bid', round(last_price_bid, 2))
-	# 	_, _, bid = get_depth(coin1=coin1)
-	# 	deposite = 0.1 * balance_btc
-	# 	income  = deposite * bid
-	# 	balance_btc = balance_btc - deposite
-	# 	balance_usd = balance_usd + income
-	# 	print('balance_btc =', balance_btc)
-	# 	print('balance_usd =', balance_usd)
+	# dump
+	if (new_price_bid / last_price_bid < 0.9):
+		# print('dump')
+		# print('new_price_bid:', round(new_price_bid, 2), 'last_price_bid', round(last_price_bid, 2))
+		compare = f'new price bid {round(new_price_bid, 2)} $\nlast price bid {round(last_price_bid, 2)} $'
+		_, _, bid = get_depth(coin1=coin1)
+		deposite = 0.1 * balance_btc # 5%
+		income  = deposite * bid
+		balance_btc = balance_btc - deposite
+		balance_usd = balance_usd + income
+		# print('balance_btc =', balance_btc)
+		# print('balance_usd =', balance_usd)
+		ans1 = f'balance_btc = {balance_btc}'
+		ans2 = f'balance_usd = {round(balance_usd, 2)} $'
+
+		return info, 'event: dump', compare, ans1, ans2 ###
+
+		### сделать условие продажи валюты после пампа и покупки после дампа
+		### if last_event == 'pump' and new_event == 'nothing': sell btc
 	
 
 	return info, 'xyunya', 'xyunya', 'xyunya', 'xyunya'
@@ -180,7 +188,7 @@ async def on_message(message):
 				await message.channel.send(info)
 
 			await message.channel.send('======================')
-			time.sleep(900)
+			time.sleep(600)
 		# print(f'balance_btc = {balance_btc} \nbalance_usd = {balance_usd}')
 		balance = f'balance_btc = {balance_btc}\nbalance_usd = {round(balance_usd, 2)}\nцикл отработал'
 		await message.channel.send(balance)
