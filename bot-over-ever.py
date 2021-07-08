@@ -66,6 +66,9 @@ async def get_trades(coin1='btc', coin2='usd', limit=150, idx=1):
 	global balance_btc
 	global balance_usd
 
+	global last_event
+	global new_event
+
 	for item in response.json()[f'{coin1}_{coin2}']:
 		if item['type'] == 'ask':
 			total_trade_ask += item['price'] * item['amount']
@@ -100,11 +103,13 @@ async def get_trades(coin1='btc', coin2='usd', limit=150, idx=1):
 		# print(f'balance_usd = {balance_usd}')
 		ans1 = f'balance_btc = {balance_btc}'
 		ans2 = f'balance_usd = {round(balance_usd, 2)} $'
+		last_event = new_event
+		new_event = 'event: pump'
 
-		return info, 'event: pump', compare, ans1, ans2 ###
+		return info, new_event, compare, ans1, ans2 ###
 
 	# dump
-	if (new_price_bid / last_price_bid < 0.9):
+	elif (new_price_bid / last_price_bid < 0.9):
 		# print('dump')
 		# print('new_price_bid:', round(new_price_bid, 2), 'last_price_bid', round(last_price_bid, 2))
 		compare = f'new price bid {round(new_price_bid, 2)} $\nlast price bid {round(last_price_bid, 2)} $'
@@ -117,14 +122,45 @@ async def get_trades(coin1='btc', coin2='usd', limit=150, idx=1):
 		# print('balance_usd =', balance_usd)
 		ans1 = f'balance_btc = {balance_btc}'
 		ans2 = f'balance_usd = {round(balance_usd, 2)} $'
+		last_event = new_event
+		new_event = 'event: dump'
 
-		return info, 'event: dump', compare, ans1, ans2 ###
+		return info, new_event, compare, ans1, ans2 ###
 
-		### сделать условие продажи валюты после пампа и покупки после дампа
-		### if last_event == 'pump' and new_event == 'nothing': sell btc
-	
+	### сделать условие продажи валюты после пампа и покупки после дампа
 
-	return info, 'xyunya', 'xyunya', 'xyunya', 'xyunya'
+	last_event = new_event
+	new_event = 'event: nothing'
+
+	if (last_event == 'pump' and new_event == 'event: nothing'):
+		# sell btc
+		compare = f'new price bid {round(new_price_bid, 2)} $\nlast price bid {round(last_price_bid, 2)} $'
+		_, _, bid = get_depth(coin1=coin1)
+		deposite = 0.1 * balance_btc # 5%
+		income  = deposite * bid
+		balance_btc = balance_btc - deposite
+		balance_usd = balance_usd + income
+		# print('balance_btc =', balance_btc)
+		# print('balance_usd =', balance_usd)
+		ans1 = f'balance_btc = {balance_btc}'
+		ans2 = f'balance_usd = {round(balance_usd, 2)} $'
+		
+		return info, new_event, compare, ans1, ans2 ###
+
+	if (last_event == 'dump' and new_event == 'event: nothing'):
+		# buy btc
+		compare = f'new price ask {round(new_price_ask, 2)} $\nlast price ask {round(last_price_ask, 2)} $'
+		_, ask, _ = get_depth(coin1=coin1)
+		deposite = 0.1 * balance_usd # 5%
+		income  = deposite / ask
+		balance_btc = balance_btc + income
+		balance_usd = balance_usd - deposite
+		ans1 = f'balance_btc = {balance_btc}'
+		ans2 = f'balance_usd = {round(balance_usd, 2)} $'
+
+		return info, new_event, compare, ans1, ans2 ###
+
+	return info, new_event, 'xyunya', 'xyunya', 'xyunya'
 
 
 # def main():
@@ -144,6 +180,9 @@ last_price_ask = 0
 new_price_ask = 0
 last_price_bid = 0
 new_price_bid = 0
+
+last_event = ''
+new_event = ''
 
 
 client = discord.Client()
@@ -174,8 +213,20 @@ async def on_message(message):
 
 			info, event, compare, ans1, ans2 = await get_trades(idx=i)
 			# print(event)
-			if (event != 'xyunya'):
+			if (compare != 'xyunya' and event != 'event: nothing'):
 				await message.channel.send(info)
+				time.sleep(0.5)
+				await message.channel.send(event)
+				time.sleep(0.5)
+				await message.channel.send(compare)
+				time.sleep(0.5)
+				await message.channel.send(ans1)
+				time.sleep(0.5)
+				await message.channel.send(ans2)
+			elif (compare != 'xyunya'):
+				await message.channel.send(info)
+				time.sleep(0.5)
+				await message.channel.send('pump or dump ended')
 				time.sleep(0.5)
 				await message.channel.send(event)
 				time.sleep(0.5)
