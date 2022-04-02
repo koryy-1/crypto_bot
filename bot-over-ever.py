@@ -2,6 +2,7 @@ import time
 import datetime
 import requests
 import discord
+import os
 
 
 def get_info():
@@ -127,8 +128,6 @@ async def get_trades(coin1='btc', coin2='usd', limit=150, idx=1):
 
 		return info, new_event, compare, ans1, ans2 ###
 
-	### сделать условие продажи валюты после пампа и покупки после дампа
-
 	last_event = new_event
 	new_event = 'event: nothing'
 
@@ -160,21 +159,10 @@ async def get_trades(coin1='btc', coin2='usd', limit=150, idx=1):
 
 		return info, new_event, compare, ans1, ans2 ###
 
-	return info, new_event, 'xyunya', 'xyunya', 'xyunya'
-
-
-# def main():
-# global balance_btc
-# global balance_usd
+	return info, new_event, 'ne to', 'ne to', 'ne to'
 
 balance_btc = 0
-
 balance_usd = 1
-
-# global last_price_ask
-# global new_price_ask
-# global last_price_bid
-# global new_price_bid
 
 last_price_ask = 0
 new_price_ask = 0
@@ -213,7 +201,7 @@ async def on_message(message):
 
 			info, event, compare, ans1, ans2 = await get_trades(idx=i)
 			# print(event)
-			if (compare != 'xyunya' and event != 'event: nothing'):
+			if (compare != 'ne to' and event != 'event: nothing'):
 				await message.channel.send(info)
 				time.sleep(0.5)
 				await message.channel.send(event)
@@ -223,7 +211,7 @@ async def on_message(message):
 				await message.channel.send(ans1)
 				time.sleep(0.5)
 				await message.channel.send(ans2)
-			elif (compare != 'xyunya'):
+			elif (compare != 'ne to'):
 				await message.channel.send(info)
 				time.sleep(0.5)
 				await message.channel.send('pump or dump ended')
@@ -239,55 +227,10 @@ async def on_message(message):
 				await message.channel.send(info)
 
 			await message.channel.send('======================')
-			time.sleep(600)
+			time.sleep(10 * 60)
 		# print(f'balance_btc = {balance_btc} \nbalance_usd = {balance_usd}')
 		balance = f'balance_btc = {balance_btc}\nbalance_usd = {round(balance_usd, 2)}\nцикл отработал'
 		await message.channel.send(balance)
 
-		# if __name__ == '__main__':
-		# 	main()
 
-client.run('ODI5NzE4ODgxOTEyMDk0NzQw.YG8N7A.TYGm5Zc-7Z9yUIr8LyBavknHT84') # поменять на файл!!!
-
-
-
-
-# # def main():
-# # global balance_btc
-# # global balance_usd
-
-# balance_btc = 0
-
-# balance_usd = 1
-
-# # global last_price_ask
-# # global new_price_ask
-# # global last_price_bid
-# # global new_price_bid
-
-# last_price_ask = 0
-# new_price_ask = 0
-# last_price_bid = 0
-# new_price_bid = 0
-
-# for i in range(40):
-# 	date = datetime.datetime.today()
-# 	print(date.strftime('%H:%M'))
-
-# 	# print(get_info())
-# 	# print(get_ticker())
-# 	# print(get_ticker(coin1='eth'))
-
-# 	# print(get_depth())
-
-# 	print(get_trades(idx=i))
-# 	# print(get_trades(coin1='btc'))
-# 	# print(get_trades(coin1='doge'))
-
-# 	time.sleep(900)
-# print('balance_btc =', balance_btc)
-# print('balance_usd =', balance_usd)
-
-
-# # if __name__ == '__main__':
-# # 	main()
+client.run(os.environ['TOKEN'])
